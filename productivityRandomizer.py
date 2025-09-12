@@ -9,7 +9,7 @@ class taskWindow(wx.Frame):
         
         self.panel = wx.Panel(self)
         self.elememtWrapper = wx.BoxSizer(wx.VERTICAL)
-        #self.elememtWrapper = wx.GridSizer(cols=1, rows=2, hgap=0, vgap=30)
+        
         
         taskElements = []
 
@@ -62,7 +62,7 @@ class taskWindow(wx.Frame):
         self.taskSizer.AddMany(taskElements)
         self.elememtWrapper.Add(self.taskSizer, proportion=0, flag=wx.ALIGN_LEFT)
         #TODO: Make Display Tasks work properly
-        """
+        
         self.randomTaskSizer = wx.GridSizer(cols=2, rows=1, vgap=4, hgap=4)
         self.elememtWrapper.Add(self.randomTaskSizer, proportion=0, flag=wx.ALIGN_LEFT)
 
@@ -70,15 +70,24 @@ class taskWindow(wx.Frame):
         self.possibleTaskDisplays = []
         self.taskDeleteButtons = []
 
-        self.displayTasks()"""
+        #Not ready to call displaytask yet
+        #self.displayTasks()
+        
 
+
+        
         self.panel.SetSizer(self.elememtWrapper)
-
         
         self.Show(True)
     
-    """
+    
     def displayTasks(self):
+        #Consider making a text element in Init, and make this function update that, so we don't have to create/delete new
+        #Text elements over and over again.
+        pass
+
+
+        """
         for destroyIndex in range (len(self.possibleTaskDisplays)-1, -1, -1):
             self.possibleTaskDisplays[destroyIndex].Destroy()
             self.taskDeleteButtons[destroyIndex].Destroy()
@@ -94,7 +103,9 @@ class taskWindow(wx.Frame):
             self.randomTaskSizer.Add((self.taskDeleteButtons[taskIndex]), 0, flag=wx.ALIGN_LEFT)
         
         self.panel.SetSizer(self.elememtWrapper)
-    """
+        """
+        
+    
         
 
 
@@ -130,6 +141,8 @@ class taskWindow(wx.Frame):
             customTaskWindow(task(taskNameStr, taskMethodsList))
         else:
             tasks.append(task(taskNameStr, taskMethodsList))
+
+            #Not ready to call displaytask yet
             #mainWindow.displayTasks()
 
     
@@ -159,7 +172,8 @@ class customTaskWindow(wx.Frame):
         for inMethodEntry in self.customMethodsEntries:
             self.taskForCustomization.taskMethods.append(inMethodEntry.GetValue())
         tasks.append(self.taskForCustomization)
-
+        
+        #Not ready to call displaytask yet
         #mainWindow.displayTasks()
 
         self.Close(True)
@@ -221,7 +235,8 @@ root = wx.App()
 mainWindow = taskWindow(None, "Task Randomizer")
 
 
-
+#Suggestions on feedback: Oddbjørn mentioned that it would be great if the program would display the task chosen as
+#a person giving out the assignment, like "Oskar says, you need to write 5 key sentences about utilising user-feedback"
 
 
 

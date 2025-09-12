@@ -8,9 +8,8 @@ class taskWindow(wx.Frame):
         wx.Frame.__init__(self, parent, title=title, size=(500, 640))
         
         self.panel = wx.Panel(self)
-        self.otherPanel = wx.Panel(self)
         self.elememtWrapper = wx.BoxSizer(wx.VERTICAL)
-        self.elememtWrapper = wx.GridSizer(cols=1, rows=2, hgap=0, vgap=30)
+        #self.elememtWrapper = wx.GridSizer(cols=1, rows=2, hgap=0, vgap=30)
         
         taskElements = []
 
@@ -62,7 +61,7 @@ class taskWindow(wx.Frame):
 
         self.taskSizer.AddMany(taskElements)
         self.elememtWrapper.Add(self.taskSizer, proportion=0, flag=wx.ALIGN_LEFT)
-        
+        #TODO: Make Display Tasks work properly
         """
         self.randomTaskSizer = wx.GridSizer(cols=2, rows=1, vgap=4, hgap=4)
         self.elememtWrapper.Add(self.randomTaskSizer, proportion=0, flag=wx.ALIGN_LEFT)
@@ -160,8 +159,10 @@ class customTaskWindow(wx.Frame):
         for inMethodEntry in self.customMethodsEntries:
             self.taskForCustomization.taskMethods.append(inMethodEntry.GetValue())
         tasks.append(self.taskForCustomization)
-        self.Close(True)
+
         #mainWindow.displayTasks()
+
+        self.Close(True)
     
     def addCustomField (self, event):
         self.customEntriesAmount += 1
@@ -212,33 +213,7 @@ class task():
         return task(taskPyDict["taskName"], taskPyDict["taskMethods"])
     
     
-"""
-def addTaskWithCustomMethods(taskToBeAdded, customMethodEntries, customWindow):
-    for inMethodEntry in customMethodEntries:
-        taskToBeAdded.taskMethods.append(inMethodEntry.GetValue())
 
-    tasks.append(taskToBeAdded)
-
-    customWindow.Close(True)
-    
-
-def openCustomWindow(taskForCustomization):
-        customTaskWindow = wx.Frame(parent=None, title="Custom Task", size=(400, 300))
-        customPanel = wx.Panel(customTaskWindow)
-        customEntriesAmount = 1
-
-        
-
-        customTaskLabels = [wx.StaticText(customPanel, label=f"Custom {customEntriesAmount}:", pos=(2, 5 + (customEntriesAmount - 1) * 15))]
-        customMethodsEntries = [wx.TextCtrl(customPanel, pos=(60, 5 + (customEntriesAmount - 1) * 15))]
-
-        addTaskButton = wx.Button(customPanel, label="Add Task", pos=(2, 30 + (customEntriesAmount - 1) * 15))
-        addCustomFieldButton = wx.Button(customPanel, label="Add Custom Field", pos=(80, 30 + (customEntriesAmount - 1) * 15))
-        
-        customTaskWindow.Bind(wx.EVT_BUTTON, addTaskWithCustomMethods(taskForCustomization, customMethodsEntries), addTaskButton)
-
-        customTaskWindow.Show(True)
-"""
 
 tasks = []
 

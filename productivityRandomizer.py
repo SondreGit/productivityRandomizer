@@ -7,76 +7,88 @@ class taskWindow(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, size=(500, 640))
         
-        self.panel = wx.Panel(self)
-        self.elememtWrapper = wx.BoxSizer(wx.VERTICAL)
+        # = wx.Panel(self)
+        self.taskWrapper = wx.BoxSizer(wx.VERTICAL)
         
+        self.notebookOverview = wx.Notebook(self, style=wx.NB_TOP, name="Task Randomizer Tab Organizer", size=(60, 60))
+
         
+        self.taskPanel = wx.Panel(self.notebookOverview)
         taskElements = []
 
-        
 
-
-        self.taskNameLabel = wx.StaticText(self.panel, label="Task Name:")
+        self.taskNameLabel = wx.StaticText(self.taskPanel, label="Task Name:")
         taskElements.append(self.taskNameLabel)
-        self.taskNameInput = wx.TextCtrl(self.panel)
+        self.taskNameInput = wx.TextCtrl(self.taskPanel)
         taskElements.append(self.taskNameInput)
 
-        self.methodCheckCompletable = wx.CheckBox(self.panel, label="Completable")
+        self.methodCheckCompletable = wx.CheckBox(self.taskPanel, label="Completable")
         taskElements.append(self.methodCheckCompletable)
         #Null Element
-        taskElements.append(wx.StaticText(self.panel, label=""))
+        taskElements.append(wx.StaticText(self.taskPanel, label=""))
         
-        self.methodCheckList = wx.CheckBox(self.panel, label="5 Key Sentences")
+        self.methodCheckList = wx.CheckBox(self.taskPanel, label="5 Key Sentences")
         taskElements.append(self.methodCheckList)
         #Null Element
-        taskElements.append(wx.StaticText(self.panel, label=""))
+        taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
-        self.methodCheckWords = wx.CheckBox(self.panel, label="400 words")
+        self.methodCheckWords = wx.CheckBox(self.taskPanel, label="400 words")
         taskElements.append(self.methodCheckWords)
         #Null Element
-        taskElements.append(wx.StaticText(self.panel, label=""))
+        taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
-        self.methodCheckW3 = wx.CheckBox(self.panel, label="Complete 3+ pages (W3)")
+        self.methodCheckW3 = wx.CheckBox(self.taskPanel, label="Complete 3+ pages (W3)")
         taskElements.append(self.methodCheckW3)
         #Null Element
-        taskElements.append(wx.StaticText(self.panel, label=""))
+        taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
-        self.methodCheckProgram = wx.CheckBox(self.panel, label="Make Program")
+        self.methodCheckProgram = wx.CheckBox(self.taskPanel, label="Make Program")
         taskElements.append(self.methodCheckProgram)
         #Null Element
-        taskElements.append(wx.StaticText(self.panel, label=""))
+        taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
-        self.methodCheckCustom = wx.CheckBox(self.panel, label="Custom")
+        self.methodCheckCustom = wx.CheckBox(self.taskPanel, label="Custom")
         taskElements.append(self.methodCheckCustom)
         #Null Element
-        taskElements.append(wx.StaticText(self.panel, label=""))
+        taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
-        self.addTaskButton = wx.Button(self.panel, label="Add Task")
+        self.addTaskButton = wx.Button(self.taskPanel, label="Add Task")
         self.Bind(wx.EVT_BUTTON, self.addTaskClick, self.addTaskButton)
         taskElements.append(self.addTaskButton)
         #Null Element
-        taskElements.append(wx.StaticText(self.panel, label=""))
+        taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
+
+        
+        
         self.taskSizer = wx.GridSizer(cols=2, rows=len(taskElements)//2+1, vgap=3, hgap=3)
 
         self.taskSizer.AddMany(taskElements)
-        self.elememtWrapper.Add(self.taskSizer, proportion=0, flag=wx.ALIGN_LEFT)
+        self.taskWrapper.Add(self.taskSizer, proportion=0, flag=wx.ALIGN_LEFT)
         #TODO: Make Display Tasks work properly
         
-        self.randomTaskSizer = wx.GridSizer(cols=2, rows=1, vgap=4, hgap=4)
-        self.elememtWrapper.Add(self.randomTaskSizer, proportion=0, flag=wx.ALIGN_LEFT)
+        self.randomPanel = wx.Panel(self.notebookOverview)
+
+        self.randomOverviewLabel = wx.StaticText(self.randomPanel, label="Available Tasks:", pos=(1, 1))
+        
+        
+        self.taskListBox = wx.ListBox(self.randomPanel, size=(300, 85), pos=(1, 20))
+
+        self.randomizeButton = wx.Button(self.randomPanel, label="Randomize", pos=(1, 110))
+        
+        self.deleteButton = wx.Button(self.randomPanel, label="Delete", pos=(81, 110))
+        
+        
+        
+
+        self.notebookOverview.InsertPage(0, self.randomPanel, "RandomizeTask")
+
+
+        self.notebookOverview.InsertPage(1, self.taskPanel, "Insert Task")
+        
+        self.taskPanel.SetSizer(self.taskWrapper)
 
         
-        self.possibleTaskDisplays = []
-        self.taskDeleteButtons = []
-
-        #Not ready to call displaytask yet
-        #self.displayTasks()
-        
-
-
-        
-        self.panel.SetSizer(self.elememtWrapper)
         
         self.Show(True)
     

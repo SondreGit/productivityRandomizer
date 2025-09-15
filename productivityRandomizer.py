@@ -75,10 +75,14 @@ class taskWindow(wx.Frame):
         self.taskListBox = wx.ListBox(self.randomPanel, size=(300, 85), pos=(1, 20))
 
         self.randomizeButton = wx.Button(self.randomPanel, label="Randomize", pos=(1, 110))
+        self.Bind(wx.EVT_BUTTON, self.drawRandomTask, self.randomizeButton)
         
         self.deleteButton = wx.Button(self.randomPanel, label="Delete", pos=(81, 110))
+        self.Bind(wx.EVT_BUTTON, self.deleteTask, self.deleteButton)
+
+        self.saveAllButton = wx.Button(self.randomPanel, label="Save All", pos=(156, 110))
         
-        
+        self.resultText = wx.StaticText(self.randomPanel, label="Teddy Task is awaiting your decision", pos= (1, 140))
         
 
         self.notebookOverview.InsertPage(0, self.randomPanel, "RandomizeTask")
@@ -91,34 +95,27 @@ class taskWindow(wx.Frame):
         
         
         self.Show(True)
-    
-    
-    def displayTasks(self):
-        #Consider making a text element in Init, and make this function update that, so we don't have to create/delete new
-        #Text elements over and over again.
-        pass
-
-
-        """
-        for destroyIndex in range (len(self.possibleTaskDisplays)-1, -1, -1):
-            self.possibleTaskDisplays[destroyIndex].Destroy()
-            self.taskDeleteButtons[destroyIndex].Destroy()
-
-        self.possibleTaskDisplays = []
-        self.taskDeleteButtons = []
-
-        for taskIndex in range(0, len(tasks)):
-            self.possibleTaskDisplays.append(wx.StaticText(self.panel, label=tasks[taskIndex].taskName))
-            self.randomTaskSizer.Add((self.possibleTaskDisplays[taskIndex]), 0, flag=wx.ALIGN_LEFT)
-
-            self.taskDeleteButtons.append(wx.Button(self.panel, label="Delete"))
-            self.randomTaskSizer.Add((self.taskDeleteButtons[taskIndex]), 0, flag=wx.ALIGN_LEFT)
-        
-        self.panel.SetSizer(self.elememtWrapper)
-        """
         
     
+
+    def insertTask(self, taskInserted):
+        self.taskListBox.Insert(taskInserted.taskName, len(tasks)-1)
         
+    
+    def deleteTask(self, event):
+        taskToDelete = self.taskListBox.GetSelection()
+
+        if taskToDelete != wx.NOT_FOUND:
+            tasks.pop(taskToDelete)
+            self.taskListBox.Delete(taskToDelete)
+        else:
+            print(taskToDelete)
+
+    
+    def drawRandomTask(self, event):
+        randomTaskIndex = random.randint(0, len(tasks)-1)
+
+        self.resultText.Label = "Teddy task says that you should... " + tasks[randomTaskIndex].getTaskWithMethod()
 
 
 
@@ -153,9 +150,9 @@ class taskWindow(wx.Frame):
             customTaskWindow(task(taskNameStr, taskMethodsList))
         else:
             tasks.append(task(taskNameStr, taskMethodsList))
+            self.insertTask(task(taskNameStr, taskMethodsList))
 
-            #Not ready to call displaytask yet
-            #mainWindow.displayTasks()
+            
 
     
 
@@ -184,9 +181,8 @@ class customTaskWindow(wx.Frame):
         for inMethodEntry in self.customMethodsEntries:
             self.taskForCustomization.taskMethods.append(inMethodEntry.GetValue())
         tasks.append(self.taskForCustomization)
+        mainWindow.insertTask(self.taskForCustomization)
         
-        #Not ready to call displaytask yet
-        #mainWindow.displayTasks()
 
         self.Close(True)
     

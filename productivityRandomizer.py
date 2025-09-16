@@ -147,7 +147,7 @@ class taskWindow(wx.Frame):
         
         with open ("tasks.json", "w") as JSONFile:
             JSONFile.write(json.dumps(jsonArray, indent=2))
-            print ("Success?")
+            self.resultText.Label = "Teddy will remember that..."
 
         
 

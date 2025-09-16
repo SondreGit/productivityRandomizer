@@ -5,7 +5,7 @@ import json
 
 class taskWindow(wx.Frame):
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, size=(500, 640))
+        wx.Frame.__init__(self, parent, title=title, size=(350, 320))
         
         # = wx.Panel(self)
         self.taskWrapper = wx.BoxSizer(wx.VERTICAL)
@@ -16,52 +16,56 @@ class taskWindow(wx.Frame):
         self.taskPanel = wx.Panel(self.notebookOverview)
         taskElements = []
 
-
+        self.taskNameGrid = wx.GridSizer(cols = 2, rows=1, vgap=2, hgap=2)
         self.taskNameLabel = wx.StaticText(self.taskPanel, label="Task Name:")
-        taskElements.append(self.taskNameLabel)
-        self.taskNameInput = wx.TextCtrl(self.taskPanel)
-        taskElements.append(self.taskNameInput)
+        self.taskNameGrid.Add(self.taskNameLabel)
+
+        #taskElements.append(self.taskNameLabel)
+        self.taskNameInput = wx.TextCtrl(self.taskPanel, size=(70, 24))
+        self.taskNameGrid.Add(self.taskNameInput)
+        taskElements.append(self.taskNameGrid)
+        #taskElements.append(self.taskNameInput)
 
         self.methodCheckCompletable = wx.CheckBox(self.taskPanel, label="Completable")
         taskElements.append(self.methodCheckCompletable)
         #Null Element
-        taskElements.append(wx.StaticText(self.taskPanel, label=""))
+        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
         
         self.methodCheckList = wx.CheckBox(self.taskPanel, label="5 Key Sentences")
         taskElements.append(self.methodCheckList)
         #Null Element
-        taskElements.append(wx.StaticText(self.taskPanel, label=""))
+        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
         self.methodCheckWords = wx.CheckBox(self.taskPanel, label="400 words")
         taskElements.append(self.methodCheckWords)
         #Null Element
-        taskElements.append(wx.StaticText(self.taskPanel, label=""))
+        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
         self.methodCheckW3 = wx.CheckBox(self.taskPanel, label="Complete 3+ pages (W3)")
         taskElements.append(self.methodCheckW3)
         #Null Element
-        taskElements.append(wx.StaticText(self.taskPanel, label=""))
+        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
         self.methodCheckProgram = wx.CheckBox(self.taskPanel, label="Make Program")
         taskElements.append(self.methodCheckProgram)
         #Null Element
-        taskElements.append(wx.StaticText(self.taskPanel, label=""))
+        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
         self.methodCheckCustom = wx.CheckBox(self.taskPanel, label="Custom")
         taskElements.append(self.methodCheckCustom)
         #Null Element
-        taskElements.append(wx.StaticText(self.taskPanel, label=""))
+        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
         self.addTaskButton = wx.Button(self.taskPanel, label="Add Task")
         self.Bind(wx.EVT_BUTTON, self.addTaskClick, self.addTaskButton)
         taskElements.append(self.addTaskButton)
         #Null Element
-        taskElements.append(wx.StaticText(self.taskPanel, label=""))
+        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
 
         
         
-        self.taskSizer = wx.GridSizer(cols=2, rows=len(taskElements)//2+1, vgap=3, hgap=3)
+        self.taskSizer = wx.GridSizer(cols=1, rows=len(taskElements)+1, vgap=3, hgap=3)
 
         self.taskSizer.AddMany(taskElements)
         self.taskWrapper.Add(self.taskSizer, proportion=0, flag=wx.ALIGN_LEFT)
@@ -81,6 +85,7 @@ class taskWindow(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.deleteTask, self.deleteButton)
 
         self.saveAllButton = wx.Button(self.randomPanel, label="Save All", pos=(156, 110))
+        self.Bind(wx.EVT_BUTTON, self.saveTasks, self.saveAllButton)
         
         self.resultText = wx.StaticText(self.randomPanel, label="Teddy Task is awaiting your decision", pos= (1, 140))
         
@@ -109,18 +114,40 @@ class taskWindow(wx.Frame):
             tasks.pop(taskToDelete)
             self.taskListBox.Delete(taskToDelete)
         else:
-            print(taskToDelete)
+            self.resultText.Label = "Not even Teddy has the power to delete nothing"
 
     
     def drawRandomTask(self, event):
-        randomTaskIndex = random.randint(0, len(tasks)-1)
+        if len(tasks) < 1:
+            self.resultText.Label = "Teddy has no task for you..."
+        else:
+            randomTaskIndex = random.randint(0, len(tasks)-1)
 
-        self.resultText.Label = "Teddy task says that you should... " + tasks[randomTaskIndex].getTaskWithMethod()
+            teddyText = "Teddy task says that you should... " + tasks[randomTaskIndex].getTaskWithMethod()
+
+            finalTeddyText = ""
+
+            for signIndex in range(0, len(teddyText)):
+                finalTeddyText += teddyText[signIndex]
+                if signIndex % 60 == 59:
+                    finalTeddyText += "\n"
+            
+        
+
+
+            self.resultText.Label = finalTeddyText
 
 
 
         
-
+    def saveTasks(self, event):
+        jsonArray = []
+        for task in tasks:
+            jsonArray.append(task.exportJSON())
+        
+        with open ("tasks.json", "w") as JSONFile:
+            JSONFile.write(json.dumps(jsonArray, indent=2))
+            print ("Success?")
 
         
 
@@ -132,19 +159,19 @@ class taskWindow(wx.Frame):
         taskMethodsList = []
 
         if self.methodCheckCompletable.GetValue():
-            taskMethodsList.append("Do: ")
+            taskMethodsList.append("Do")
         
         if self.methodCheckList.GetValue():
-            taskMethodsList.append("Write 5 key sentences about: ")
+            taskMethodsList.append("Write 5 key sentences about")
         
         if self.methodCheckWords.GetValue():
-            taskMethodsList.append("Write 400 words about: ")
+            taskMethodsList.append("Write 400 words about")
 
         if self.methodCheckW3.GetValue():
-            taskMethodsList.append("Complete 3 or more pages (usually on W3) about: ")
+            taskMethodsList.append("Complete 3 or more pages (usually on W3) about")
 
         if self.methodCheckProgram.GetValue():
-            taskMethodsList.append("Make a program about: ")
+            taskMethodsList.append("Make a program about")
         
         if self.methodCheckCustom.GetValue():
             customTaskWindow(task(taskNameStr, taskMethodsList))
@@ -215,9 +242,9 @@ class task():
     def getTaskWithMethod(self):
         if len(self.taskMethods) > 1:
             methodIndex = random.randint(0, len(self.taskMethods)-1)
-            return self.taskMethods[methodIndex]+self.taskName
+            return self.taskMethods[methodIndex]+": "+self.taskName
         elif len(self.taskMethods) == 1:
-            return self.taskMethods[0]+self.taskName
+            return self.taskMethods[0]+": "+self.taskName
         else:
             return "Do: " + self.taskName
     
@@ -227,7 +254,8 @@ class task():
             "taskMethods": self.taskMethods
         }
 
-        return json.dumps(JSON)
+        #return json.dumps(JSON)
+        return JSON
     
     def taskFromJSON(JSON):
         taskPyDict = json.loads(JSON)        
@@ -243,10 +271,18 @@ root = wx.App()
 mainWindow = taskWindow(None, "Task Randomizer")
 
 
+with open ("tasks.json", "r") as JSONFile:
+    taskListJSON = JSONFile.read()
+    taskListLoaded = json.loads(taskListJSON)
+    for specificTask in taskListLoaded:
+        loadedTask = task(specificTask['taskName'], specificTask['taskMethods'])
+        tasks.append(loadedTask)
+        mainWindow.insertTask(loadedTask)
+
+
+
 #Suggestions on feedback: Oddbjørn mentioned that it would be great if the program would display the task chosen as
 #a person giving out the assignment, like "Oskar says, you need to write 5 key sentences about utilising user-feedback"
-
-
 
 root.MainLoop()
 

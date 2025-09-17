@@ -5,7 +5,7 @@ import json
 
 class taskWindow(wx.Frame):
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, size=(350, 320))
+        wx.Frame.__init__(self, parent, title=title, size=(500, 320))
         
         # = wx.Panel(self)
         self.taskWrapper = wx.BoxSizer(wx.VERTICAL)
@@ -76,7 +76,7 @@ class taskWindow(wx.Frame):
         self.randomOverviewLabel = wx.StaticText(self.randomPanel, label="Available Tasks:", pos=(1, 1))
         
         
-        self.taskListBox = wx.ListBox(self.randomPanel, size=(300, 85), pos=(1, 20))
+        self.taskListBox = wx.ListBox(self.randomPanel, size=(450, 85), pos=(1, 20))
 
         self.randomizeButton = wx.Button(self.randomPanel, label="Randomize", pos=(1, 110))
         self.Bind(wx.EVT_BUTTON, self.drawRandomTask, self.randomizeButton)
@@ -123,21 +123,11 @@ class taskWindow(wx.Frame):
         else:
             randomTaskIndex = random.randint(0, len(tasks)-1)
 
-            teddyText = "Teddy task says that you should... " + tasks[randomTaskIndex].getTaskWithMethod()
-
-            finalTeddyText = ""
-
-            for signIndex in range(0, len(teddyText)):
-                finalTeddyText += teddyText[signIndex]
-                if signIndex % 60 == 59:
-                    finalTeddyText += "\n"
+            teddyText = f"Teddy task says that you have to... {tasks[randomTaskIndex].getTaskWithMethod()}" 
             
-        
-
-
-            self.resultText.Label = finalTeddyText
-
-
+            textWidth = self.GetSize().GetWidth()//6
+            
+            self.resultText.Label = manageLine(teddyText, textWidth)
 
         
     def saveTasks(self, event):
@@ -257,12 +247,25 @@ class task():
         #return json.dumps(JSON)
         return JSON
     
-    def taskFromJSON(JSON):
-        taskPyDict = json.loads(JSON)        
+def manageLine(inText, lineSplitCharacters):
+    splitText = inText.split()
 
-        return task(taskPyDict["taskName"], taskPyDict["taskMethods"])
+    textLines = [splitText[0]]
+
     
-    
+    textIndex = 0
+    for wordIndex in range(1, len(splitText)):
+        if len(textLines[textIndex] + " " + splitText[wordIndex]) > lineSplitCharacters:
+            textIndex += 1
+            textLines.append(splitText[wordIndex])
+        else:
+            textLines[textIndex] += " " + splitText[wordIndex]
+
+
+    outText = textLines[0]
+    for line in textLines[1:]:
+        outText += "\n" + line
+    return outText
 
 
 tasks = []
@@ -285,21 +288,3 @@ with open ("tasks.json", "r") as JSONFile:
 #a person giving out the assignment, like "Oskar says, you need to write 5 key sentences about utilising user-feedback"
 
 root.MainLoop()
-
-"""
-while(True):
-
-
-    
-
-    print ("press enter to continue")
-    input()
-
-    taskIndex = random.randint(0, len(tasks)-1)
-
-    if specificTask[taskIndex]:
-        print ("Do "+tasks[taskIndex])
-    else:
-        methodIndex = random.randint(0, len(taskMethods)-1)
-        print(taskMethods[methodIndex]+tasks[taskIndex])
-"""

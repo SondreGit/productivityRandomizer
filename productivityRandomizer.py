@@ -57,7 +57,9 @@ class taskWindow(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.addTaskClick, self.addTaskButton)
         taskElements.append(self.addTaskButton)
         
-        
+
+        #We establish the gridsizer here and add all the elements from the taskelements array immediately.
+        #This is primarily because it allows us to establish the amount of rows already ready.
         self.taskSizer = wx.GridSizer(cols=1, rows=len(taskElements)+1, vgap=3, hgap=3)
 
         self.taskSizer.AddMany(taskElements)
@@ -72,22 +74,26 @@ class taskWindow(wx.Frame):
         
         #List box that displays the tasks that the program can choose from.
         self.taskListBox = wx.ListBox(self.randomPanel, size=(450, 85), pos=(1, 20))
-
+        
+        #Button to pick a random task
         self.randomizeButton = wx.Button(self.randomPanel, label="Randomize", pos=(1, 110))
         self.Bind(wx.EVT_BUTTON, self.drawRandomTask, self.randomizeButton)
         
+        #User can select a task and delete it from both the list and the array
         self.deleteButton = wx.Button(self.randomPanel, label="Delete", pos=(81, 110))
         self.Bind(wx.EVT_BUTTON, self.deleteTask, self.deleteButton)
 
+        #Button that can be pressed to save the current set of tasks to the JSON
         self.saveAllButton = wx.Button(self.randomPanel, label="Save All", pos=(156, 110))
         self.Bind(wx.EVT_BUTTON, self.saveTasks, self.saveAllButton)
         
+        #Text that shows which task is selected to the user, and also conveys information where it's relevant.
         self.resultText = wx.StaticText(self.randomPanel, label="Teddy Task is awaiting your decision", pos= (1, 140))
         
-
+        #We want to make the task for randomizing the page the default "index 0", so it has to be added first.
         self.notebookOverview.InsertPage(0, self.randomPanel, "RandomizeTask")
 
-
+        #The insert task panel can still be made "index 1" and not be the default page by adding it after.
         self.notebookOverview.InsertPage(1, self.taskPanel, "Insert Task")
         
         self.taskPanel.SetSizer(self.taskWrapper)
@@ -217,37 +223,43 @@ class customTaskWindow(wx.Frame):
 
 
 
-
+#We make tasks a simple object with a string for a name and an array of strings for methods.
 class task():
     def __init__(self, taskName, taskMethods):
         self.taskName = taskName
         self.taskMethods = taskMethods
         
-    
+    #Picks a random of the methods made for the tasks, defaults to the completable option
     def getTaskWithMethod(self):
+        #Picks a random of the available tasks if there's more than 1.
         if len(self.taskMethods) > 1:
             methodIndex = random.randint(0, len(self.taskMethods)-1)
             return self.taskMethods[methodIndex]+": "+self.taskName
+        #If there's only 1 task, it will just pick the one available
         elif len(self.taskMethods) == 1:
             return self.taskMethods[0]+": "+self.taskName
+        #Otherwise, it defaults to just doing the task
         else:
             return "Do: " + self.taskName
     
+    #Function that compresses the information of the task into a python dictionary so it's ready to be dumped into JSON.
     def exportJSON(self):
         JSON = {
             "taskName": self.taskName,
             "taskMethods": self.taskMethods
         }
 
-        #return json.dumps(JSON)
         return JSON
-    
+
+#Function that puts a character limit (lineSplitCharacters) on lines in a string(inText).
 def manageLine(inText, lineSplitCharacters):
+    #splitting up the text by words
     splitText = inText.split()
 
+    #Putting the first word into the first line of the out-string
     textLines = [splitText[0]]
 
-    
+    #splitting up the string into different lines in a list.
     textIndex = 0
     for wordIndex in range(1, len(splitText)):
         if len(textLines[textIndex] + " " + splitText[wordIndex]) > lineSplitCharacters:
@@ -256,18 +268,20 @@ def manageLine(inText, lineSplitCharacters):
         else:
             textLines[textIndex] += " " + splitText[wordIndex]
 
-
+    #Combining the lines from the list into a finished string product that is then returned.
     outText = textLines[0]
     for line in textLines[1:]:
         outText += "\n" + line
     return outText
 
-
+#We make the array for the listed tasks
 tasks = []
 
 root = wx.App()
 mainWindow = taskWindow(None, "Task Randomizer")
 
+
+#We try to read the file and add tasks from it, but if the file doesn't exist, then it makes the JSON file with an empty array. 
 try:
     with open ("tasks.json", "r") as JSONFile:
         taskListJSON = JSONFile.read()

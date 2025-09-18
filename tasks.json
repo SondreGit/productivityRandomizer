@@ -49,5 +49,11 @@
     "taskMethods": [
       "Write 5 key sentences about"
     ]
+  },
+  {
+    "taskName": "CSS",
+    "taskMethods": [
+      "Complete 3 or more pages (usually on W3) about"
+    ]
   }
 ]

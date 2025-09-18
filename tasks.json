@@ -1,9 +1,53 @@
 [
   {
-    "taskName": "Stinking up the place",
+    "taskName": "Javascript",
     "taskMethods": [
-      "Make a program about",
-      "Avoid"
+      "Write 5 key sentences about",
+      "Complete 3 or more pages (usually on W3) about",
+      "Make a program about"
+    ]
+  },
+  {
+    "taskName": "Python",
+    "taskMethods": [
+      "Write 5 key sentences about",
+      "Complete 3 or more pages (usually on W3) about",
+      "Make a program about"
+    ]
+  },
+  {
+    "taskName": "Infrastructure and Architecture",
+    "taskMethods": [
+      "Write 5 key sentences about",
+      "Find good examples of",
+      "Find bad examples of"
+    ]
+  },
+  {
+    "taskName": "Universal design",
+    "taskMethods": [
+      "Write 5 key sentences about",
+      "Make a program about"
+    ]
+  },
+  {
+    "taskName": "AZ-500",
+    "taskMethods": [
+      "Write 5 key sentences about",
+      "Write 400 words about",
+      "Do 3 pages, taking 1 keyword from each page"
+    ]
+  },
+  {
+    "taskName": "Check notes on laws",
+    "taskMethods": [
+      "Do"
+    ]
+  },
+  {
+    "taskName": "UN sustainability goals",
+    "taskMethods": [
+      "Write 5 key sentences about"
     ]
   }
 ]

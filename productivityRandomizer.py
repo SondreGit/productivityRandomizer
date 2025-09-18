@@ -10,59 +10,52 @@ class taskWindow(wx.Frame):
         # = wx.Panel(self)
         self.taskWrapper = wx.BoxSizer(wx.VERTICAL)
         
-        self.notebookOverview = wx.Notebook(self, style=wx.NB_TOP, name="Task Randomizer Tab Organizer", size=(60, 60))
+        #We use notebook here to add tabs, later on adding taskpanel and randompanel to it. 
+        self.notebookOverview = wx.Notebook(self, style=wx.NB_TOP, name="Task Randomizer Tab Organizer")
 
-        
+        #Panel for adding tasks, we have the taskElements label here because we believed it was necessary 
         self.taskPanel = wx.Panel(self.notebookOverview)
         taskElements = []
 
+        #We make a separate gridsizer here to line up better with the rest of the functions.
         self.taskNameGrid = wx.GridSizer(cols = 2, rows=1, vgap=2, hgap=2)
         self.taskNameLabel = wx.StaticText(self.taskPanel, label="Task Name:")
         self.taskNameGrid.Add(self.taskNameLabel)
 
-        #taskElements.append(self.taskNameLabel)
+        #Text input
         self.taskNameInput = wx.TextCtrl(self.taskPanel, size=(70, 24))
         self.taskNameGrid.Add(self.taskNameInput)
         taskElements.append(self.taskNameGrid)
-        #taskElements.append(self.taskNameInput)
 
+        #Checkboxes for different methods:
+        #Default method, to see if the method is something that can just be done in a relatively short amount of time.
         self.methodCheckCompletable = wx.CheckBox(self.taskPanel, label="Completable")
         taskElements.append(self.methodCheckCompletable)
-        #Null Element
-        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
         
+        #Method for writing 5 key sentences about a subject in question
         self.methodCheckList = wx.CheckBox(self.taskPanel, label="5 Key Sentences")
         taskElements.append(self.methodCheckList)
-        #Null Element
-        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
+        #Method for writing a 400 word page about the subject in question
         self.methodCheckWords = wx.CheckBox(self.taskPanel, label="400 words")
         taskElements.append(self.methodCheckWords)
-        #Null Element
-        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
+        #Method for completing 3+ pages on the W3 site of the subject.
         self.methodCheckW3 = wx.CheckBox(self.taskPanel, label="Complete 3+ pages (W3)")
         taskElements.append(self.methodCheckW3)
-        #Null Element
-        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
-
+        
+        #Method for working on making a program that involves the subject.
         self.methodCheckProgram = wx.CheckBox(self.taskPanel, label="Make Program")
         taskElements.append(self.methodCheckProgram)
-        #Null Element
-        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
 
+        #Method for writing your own custom method if the existing checkboxes aren't enough
         self.methodCheckCustom = wx.CheckBox(self.taskPanel, label="Custom")
         taskElements.append(self.methodCheckCustom)
-        #Null Element
-        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
-
+        
+        #Button that adds a task to the list. 
         self.addTaskButton = wx.Button(self.taskPanel, label="Add Task")
         self.Bind(wx.EVT_BUTTON, self.addTaskClick, self.addTaskButton)
         taskElements.append(self.addTaskButton)
-        #Null Element
-        #taskElements.append(wx.StaticText(self.taskPanel, label=""))
-
-
         
         
         self.taskSizer = wx.GridSizer(cols=1, rows=len(taskElements)+1, vgap=3, hgap=3)
@@ -71,11 +64,13 @@ class taskWindow(wx.Frame):
         self.taskWrapper.Add(self.taskSizer, proportion=0, flag=wx.ALIGN_LEFT)
         #TODO: Make Display Tasks work properly
         
+        #Panel for displaying and selecting random tasks and managing them.
         self.randomPanel = wx.Panel(self.notebookOverview)
 
+        #Just some text at the start
         self.randomOverviewLabel = wx.StaticText(self.randomPanel, label="Available Tasks:", pos=(1, 1))
         
-        
+        #List box that displays the tasks that the program can choose from.
         self.taskListBox = wx.ListBox(self.randomPanel, size=(450, 85), pos=(1, 20))
 
         self.randomizeButton = wx.Button(self.randomPanel, label="Randomize", pos=(1, 110))
@@ -273,18 +268,21 @@ tasks = []
 root = wx.App()
 mainWindow = taskWindow(None, "Task Randomizer")
 
-
-with open ("tasks.json", "r") as JSONFile:
-    taskListJSON = JSONFile.read()
-    taskListLoaded = json.loads(taskListJSON)
-    for specificTask in taskListLoaded:
-        loadedTask = task(specificTask['taskName'], specificTask['taskMethods'])
-        tasks.append(loadedTask)
-        mainWindow.insertTask(loadedTask)
-
+try:
+    with open ("tasks.json", "r") as JSONFile:
+        taskListJSON = JSONFile.read()
+        taskListLoaded = json.loads(taskListJSON)
+        for specificTask in taskListLoaded:
+            loadedTask = task(specificTask['taskName'], specificTask['taskMethods'])
+            tasks.append(loadedTask)
+            mainWindow.insertTask(loadedTask)
+except:
+    with open ("tasks.json", "w") as JSONFile:
+        JSONFile.write(json.dumps([], indent=2))
 
 
 #Suggestions on feedback: Oddbjørn mentioned that it would be great if the program would display the task chosen as
 #a person giving out the assignment, like "Oskar says, you need to write 5 key sentences about utilising user-feedback"
 
 root.MainLoop()
+

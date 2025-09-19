@@ -96,6 +96,7 @@ class taskWindow(wx.Frame):
         #The insert task panel can still be made "index 1" and not be the default page by adding it after.
         self.notebookOverview.InsertPage(1, self.taskPanel, "Insert Task")
         
+        #Set the sizer to the taskwrapper, to organize all the items into positions.
         self.taskPanel.SetSizer(self.taskWrapper)
 
         
@@ -103,14 +104,16 @@ class taskWindow(wx.Frame):
         self.Show(True)
         
     
-
+    #Puts a task name of a specific task into the listbox.
     def insertTask(self, taskInserted):
         self.taskListBox.Insert(taskInserted.taskName, len(tasks)-1)
         
-    
+    #Function for deleting a selected task
     def deleteTask(self, event):
+        #We get an index of the listbox that corresponds to a task on the list and on the array.
         taskToDelete = self.taskListBox.GetSelection()
 
+        #If a task is not chosen, it will pop an error message.
         if taskToDelete != wx.NOT_FOUND:
             tasks.pop(taskToDelete)
             self.taskListBox.Delete(taskToDelete)
@@ -118,37 +121,46 @@ class taskWindow(wx.Frame):
             self.resultText.Label = "Not even Teddy has the power to delete nothing"
 
     
+    #Function for picking a random task from the list.
     def drawRandomTask(self, event):
+        #First it checks if there's 1 or more tasks to chose from, sending an error message if not.
         if len(tasks) < 1:
             self.resultText.Label = "Teddy has no task for you..."
         else:
+            #Then it draws a random number based on how many tasks there are and picks the task with a corresponding index.
             randomTaskIndex = random.randint(0, len(tasks)-1)
 
+            #We use the getTaskWithMethod function here to also get a random method from the task to complete the base message text.
             teddyText = f"Teddy task says that you have to... {tasks[randomTaskIndex].getTaskWithMethod()}" 
             
+            #We set the character limit of the text based on the width of the window.
             textWidth = self.GetSize().GetWidth()//6
             
+            #We use the manage line function from later here to add the appropriate amount of lines.
             self.resultText.Label = manageLine(teddyText, textWidth)
 
-        
+    #Function for saving all the tasks to the tasks.json file.
     def saveTasks(self, event):
+        #We prepare the an array with dictionaries of the tasks
         jsonArray = []
         for task in tasks:
             jsonArray.append(task.exportJSON())
         
+        #Write the file and give a message that the file was successfully overwritten.
         with open ("tasks.json", "w") as JSONFile:
             JSONFile.write(json.dumps(jsonArray, indent=2))
             self.resultText.Label = "Teddy will remember that..."
-
-        
-
+    
 
 
+    #Function for adding a task to the task list, activated by pressing the "Add task" button.
     def addTaskClick(self, event):
+        #Establishing the main variables here, the str for the name and the list for the methods.
         taskNameStr = self.taskNameInput.GetValue()
         
         taskMethodsList = []
 
+        #Then we check if each of the check-boxes are clicked.
         if self.methodCheckCompletable.GetValue():
             taskMethodsList.append("Do")
         
@@ -164,6 +176,8 @@ class taskWindow(wx.Frame):
         if self.methodCheckProgram.GetValue():
             taskMethodsList.append("Make a program about")
         
+        #For the custom one, if it's not checked the task is simply added, but if the custom is checked, then
+        #we send the already checked methods and the name to a new window for adding custom methods.
         if self.methodCheckCustom.GetValue():
             customTaskWindow(task(taskNameStr, taskMethodsList))
         else:
@@ -173,46 +187,66 @@ class taskWindow(wx.Frame):
             
 
     
-
+#Window for adding custom task methods.
 class customTaskWindow(wx.Frame):
     def __init__(self, taskForCustomization):
         wx.Frame.__init__(self, title="Custom Method Task", parent=None, size=(400, 580))
         self.Panel = wx.Panel(self)
+        
+        #The window requires a task to be customized, this is where that variable is stored.
         self.taskForCustomization = taskForCustomization
-
+        
+        #We keep track of many entries are added. wx is a bit painful with sizers, since it can't add new items
+        #after a sizer has already been fixed to the window.
         self.customEntriesAmount = 1
 
+        #We make a list of the labels and entries for the fields, and start them off with 1 already added.
         self.customTaskLabels = [wx.StaticText(self.Panel, label=f"Custom {self.customEntriesAmount}:",
                                                pos=(2, 5 + (self.customEntriesAmount - 1) * 25))]
         self.customMethodsEntries = [wx.TextCtrl(self.Panel, pos=(60, 5 + (self.customEntriesAmount - 1) * 25))]
 
+        #Button for adding a task to the task-list, closes this window as part of it.
         self.addTaskButton = wx.Button(self.Panel, label="Add Task", pos=(2, 30 + (self.customEntriesAmount - 1) * 25))
+
+        #Button for adding another field, also moves these buttons down. Everything is manual positioning because it's a lot more precise.
         self.addCustomFieldButton = wx.Button(self.Panel, label="Add Custom Field", pos=(80, 30 + (self.customEntriesAmount - 1) * 25))
         
+        #Binding buttons to the respective functions.
         self.Bind(wx.EVT_BUTTON, self.addTaskWithCustomMethods, self.addTaskButton)
         self.Bind(wx.EVT_BUTTON, self.addCustomField, self.addCustomFieldButton)
 
         self.Show(True)
 
-
+    #Function bound to the add task button
     def addTaskWithCustomMethods(self, event):
+        #We go through the list of entries and add their text to task methods if they're not empty.
         for inMethodEntry in self.customMethodsEntries:
-            self.taskForCustomization.taskMethods.append(inMethodEntry.GetValue())
+            if inMethodEntry.GetValue() != "":
+                self.taskForCustomization.taskMethods.append(inMethodEntry.GetValue())
+        #Add the task to the list of tasks after adding the custom methods
         tasks.append(self.taskForCustomization)
+        #As well as the listbox in the taskwindow.
         mainWindow.insertTask(self.taskForCustomization)
-        
 
+        #Then we close the window since we're done with the task.
         self.Close(True)
     
+    #Function for adding an extra custom field, bound to the add custom field button.
     def addCustomField (self, event):
+        #Increasing the amount of custom entries, so it can change and correspond to the new position.
         self.customEntriesAmount += 1
+
+        #Add a new label and entry to the lists while making them with new positions.
         self.customTaskLabels.append(wx.StaticText(self.Panel, label=f"Custom {self.customEntriesAmount}:",
                                                pos=(2, 5 + (self.customEntriesAmount - 1) * 25)))
         self.customMethodsEntries.append(wx.TextCtrl(self.Panel, pos=(60, 5 + (self.customEntriesAmount - 1) * 25)))
-
+        
+        #Then we move down the buttons down.
         self.addTaskButton.SetPosition((2, 30 + (self.customEntriesAmount - 1) * 25))
         self.addCustomFieldButton.SetPosition((80, 30 + (self.customEntriesAmount - 1) * 25))
 
+        #We set a hard cap of 16 custom entries, disabling the button if more than  it are added. At that point it should probably be enough
+        #Also, it won't fit the buttons on-screen anymore after that.
         if self.customEntriesAmount >= 16:
             self.addCustomFieldButton.Disable()
         
